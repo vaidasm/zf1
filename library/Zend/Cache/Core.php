@@ -300,7 +300,7 @@ class Zend_Cache_Core
         }
         $id = $this->_id($id); // cache id may need prefix
         $this->_lastId = $id;
-        self::_validateIdOrTag($id);
+        $this->_validateKey($id);
 
         $this->_log("Zend_Cache_Core: load item '{$id}'", 7);
         $data = $this->_backend->load($id, $doNotTestCacheValidity);
@@ -327,7 +327,7 @@ class Zend_Cache_Core
             return false;
         }
         $id = $this->_id($id); // cache id may need prefix
-        self::_validateIdOrTag($id);
+        $this->_validateKey($id);
         $this->_lastId = $id;
 
         $this->_log("Zend_Cache_Core: test item '{$id}'", 7);
@@ -355,8 +355,8 @@ class Zend_Cache_Core
         } else {
             $id = $this->_id($id);
         }
-        self::_validateIdOrTag($id);
-        self::_validateTagsArray($tags);
+        $this->_validateKey($id);
+        $this->_validateKeysArray($tags);
         if ($this->_options['automatic_serialization']) {
             // we need to serialize datas before storing them
             $data = serialize($data);
@@ -424,7 +424,7 @@ class Zend_Cache_Core
             return true;
         }
         $id = $this->_id($id); // cache id may need prefix
-        self::_validateIdOrTag($id);
+        $this->_validateKey($id);
 
         $this->_log("Zend_Cache_Core: remove item '{$id}'", 7);
         return $this->_backend->remove($id);
@@ -460,7 +460,7 @@ class Zend_Cache_Core
                                    Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG))) {
             Zend_Cache::throwException('Invalid cleaning mode');
         }
-        self::_validateTagsArray($tags);
+        $this->_validateKeysArray($tags);
 
         return $this->_backend->clean($mode, $tags);
     }
@@ -698,6 +698,26 @@ class Zend_Cache_Core
             self::_validateIdOrTag($tag);
         }
         reset($tags);
+    }
+
+    /**
+     * @param  string $string Cache key or tag
+     * @throws Zend_Cache_Exception
+     * @return void
+     */
+    protected function _validateKey($string)
+    {
+        self::_validateIdOrTag($string);
+    }
+
+    /**
+     * @param  array $tags Array of tags
+     * @throws Zend_Cache_Exception
+     * @return void
+     */
+    protected function _validateKeysArray($tags)
+    {
+        self::_validateTagsArray($tags);
     }
 
     /**
